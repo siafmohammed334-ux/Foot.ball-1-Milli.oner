@@ -1,0 +1,23 @@
+name: Add new questions
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  add:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate questions
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python3 scripts/generate_questions.py
+      - name: Commit
+        run: |
+          git config user.name "questions-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add questions
+          git commit -m "Add new questions [skip ci]" || exit 0
+          git push
